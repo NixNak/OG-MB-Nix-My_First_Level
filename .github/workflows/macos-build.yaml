@@ -9,6 +9,21 @@ on:
       cachePrefix:
         required: true
         type: string
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+jobs:
+  build:
+<<<<<<<< HEAD:.github/workflows/macos-build.yaml
+    name: Intel
+    runs-on: macos-12
+========
+    name: ARM
+    runs-on: macos-latest
+>>>>>>>> vanilla/master:.github/workflows/macos-build-arm.yaml
+=======
+>>>>>>> upstream/8-12-vanilla
       uploadArtifacts:
         required: false
         type: boolean
@@ -17,7 +32,12 @@ on:
 jobs:
   build:
     name: Intel
+<<<<<<< HEAD
     runs-on: macos-11
+=======
+    runs-on: macos-12
+>>>>>>> vanilla/master
+>>>>>>> upstream/8-12-vanilla
     timeout-minutes: 120
 
     env: # overrides: https://github.com/mbitsnbites/buildcache/blob/master/doc/configuration.md
@@ -31,8 +51,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+<<<<<<< HEAD
+      - name: Set up ARM64 environment
+        run: sudo softwareupdate --install-rosetta --agree-to-license
+
+      - name: Install Package Dependencies
+        run: arch -arm64 brew install cmake ninja
+=======
       - name: Install Package Dependencies
         run: brew install cmake nasm ninja
+>>>>>>> vanilla/master
 
       - name: Setup Buildcache
         uses: mikehardy/buildcache-action@v2.1.0
@@ -56,6 +84,7 @@ jobs:
       - name: Run Tests
         run: ./test.sh
 
+<<<<<<< HEAD
       - name: Prepare artifacts
         if: ${{ inputs.uploadArtifacts }}
         run: |
@@ -67,6 +96,24 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         if: ${{ inputs.uploadArtifacts }}
+=======
+<<<<<<< HEAD
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+=======
+      - name: Prepare artifacts
+        if: ${{ inputs.uploadArtifacts }}
+        run: |
+          strip ./build/goalc/goalc
+          strip ./build/decompiler/extractor
+          strip ./build/game/gk
+          strip ./build/lsp/lsp
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.uploadArtifacts }}
+>>>>>>> vanilla/master
+>>>>>>> upstream/8-12-vanilla
         with:
           name: opengoal-macos-${{ inputs.cachePrefix }}
           if-no-files-found: error

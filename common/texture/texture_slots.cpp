@@ -38,8 +38,11 @@ std::vector<std::string> jak2_slots = {
     "fort-roboscreen-dest",
     "squid-env-rim-dest",
     "krew-holo-dest",
+<<<<<<< HEAD
     "cas-toxic-slime-dest",
     "cas-toxic-slime-scroll-dest",
+=======
+>>>>>>> upstream/8-12-vanilla
 };
 
 }

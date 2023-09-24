@@ -128,7 +128,10 @@ void set_file(const std::string& filename,
   } else {
     file_path = file_util::get_file_path({"log", filename});
   }
+<<<<<<< HEAD
   file_util::create_dir_if_needed_for_file(file_path);
+=======
+>>>>>>> upstream/8-12-vanilla
   std::string complete_filename = file_path;
   if (should_rotate) {
     complete_filename += "." + str_util::current_local_timestamp_no_colons() + ".log";

@@ -385,8 +385,11 @@ class TextureAnimator {
                                  const std::string& suffix1,
                                  const std::optional<std::string>& dgo);
   void run_clut_blender_group(DmaTransfer& tf, int idx, u64 frame_idx);
+<<<<<<< HEAD
   GLint run_clouds(const SkyInput& input, bool hires);
   void run_slime(const SlimeInput& input);
+=======
+>>>>>>> upstream/8-12-vanilla
 
   Psm32ToPsm8Scrambler m_psm32_to_psm8_8_8, m_psm32_to_psm8_16_16, m_psm32_to_psm8_32_32,
       m_psm32_to_psm8_64_64;

@@ -540,7 +540,15 @@ void TextureAnimator::draw_debug_window() {
   auto& slots = jak2_animated_texture_slots();
   for (size_t i = 0; i < slots.size(); i++) {
     ImGui::Text("Slot %d %s (%d)", (int)i, slots[i].c_str(), (int)m_private_output_slots[i]);
+<<<<<<< HEAD
     imgui_show_tex(m_private_output_slots[i]);
+=======
+    glBindTexture(GL_TEXTURE_2D, m_private_output_slots[i]);
+    int w, h;
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
+    ImGui::Image((void*)(u64)m_private_output_slots[i], ImVec2(w, h));
+>>>>>>> upstream/8-12-vanilla
     ImGui::Checkbox(fmt::format("mark {}", i).c_str(), &m_output_debug_flags.at(i).b);
   }
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -626,9 +634,12 @@ enum PcTextureAnimCodes {
   METKOR = 38,
   SHIELD = 39,
   KREW_HOLO = 40,
+<<<<<<< HEAD
   CLOUDS_AND_FOG = 41,
   SLIME = 42,
   CLOUDS_HIRES = 43,
+=======
+>>>>>>> upstream/8-12-vanilla
 };
 
 // metadata for an upload from GOAL memory
@@ -671,7 +682,11 @@ void TextureAnimator::handle_texture_anim_data(DmaFollower& dma,
     m_opengl_texture_pool.free(t.tex, t.w, t.h);
   }
   m_in_use_temp_textures.clear();  // reset temp texture allocator.
+<<<<<<< HEAD
   m_force_to_gpu.clear();
+=======
+  m_erased_on_this_frame.clear();
+>>>>>>> upstream/8-12-vanilla
   m_skip_tbps.clear();
 
   // loop over DMA, and do the appropriate texture operations.
@@ -783,6 +798,7 @@ void TextureAnimator::handle_texture_anim_data(DmaFollower& dma,
         case KREW_HOLO: {
           auto p = scoped_prof("krew-holo");
           run_fixed_animation_array(m_krew_holo_anim_array_idx, tf, texture_pool);
+<<<<<<< HEAD
         } break;
         case CLOUDS_AND_FOG:
         case CLOUDS_HIRES: {
@@ -792,6 +808,8 @@ void TextureAnimator::handle_texture_anim_data(DmaFollower& dma,
         case SLIME: {
           auto p = scoped_prof("slime");
           handle_slime(tf, texture_pool);
+=======
+>>>>>>> upstream/8-12-vanilla
         } break;
         default:
           fmt::print("bad imm: {}\n", vif0.immediate);
@@ -988,6 +1006,136 @@ void debug_save_opengl_texture(const std::string& out, GLuint texture) {
   file_util::write_rgba_png(out, data.data(), w, h);
 }
 
+<<<<<<< HEAD
+=======
+/*!
+ * Copy rg channels to ba from src to dst.
+ * The PS2 implementation is confusing, and this is just a guess at how it works.
+ */
+void TextureAnimator::handle_rg_to_ba(const DmaTransfer& tf) {
+  dprintf("[tex anim] rg -> ba\n");
+  ASSERT(tf.size_bytes == sizeof(TextureAnimPcTransform));
+  auto* data = (const TextureAnimPcTransform*)(tf.data);
+  dprintf("  src: %d, dest: %d\n", data->src_tbp, data->dst_tbp);
+  const auto& src = m_textures.find(data->src_tbp);
+  const auto& dst = m_textures.find(data->dst_tbp);
+  if (src != m_textures.end() && dst != m_textures.end()) {
+    ASSERT(src->second.kind == VramEntry::Kind::GPU);
+    ASSERT(dst->second.kind == VramEntry::Kind::GPU);
+    ASSERT(src->second.tex.value().texture() != dst->second.tex.value().texture());
+    FramebufferTexturePairContext ctxt(dst->second.tex.value());
+    float positions[3 * 4] = {0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0};
+    float uvs[2 * 4] = {0, 0, 1, 0, 1, 1, 0, 1};
+    glUniform3fv(m_uniforms.positions, 4, positions);
+    glUniform2fv(m_uniforms.uvs, 4, uvs);
+    glUniform1i(m_uniforms.enable_tex, 1);
+    glUniform4f(m_uniforms.rgba, 256, 256, 256, 128);  // TODO - seems wrong.
+    glUniform4i(m_uniforms.channel_scramble, 0, 1, 0, 1);
+    // not sure if this is right or not: the entire cloud stuff is kinda broken.
+    glUniform1f(m_uniforms.alpha_multiply, 1.f);
+    glBindTexture(GL_TEXTURE_2D, src->second.tex.value().texture());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glColorMask(true, true, true, true);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+  } else {
+    ASSERT_NOT_REACHED();
+  }
+
+  //  const auto& vram_src = m_vram_entries.find(data->src_tbp);
+  //  if (vram_src != m_vram_entries.end()) {
+  //    ASSERT(vram_src->second.kind == VramEntry::Kind::GENERIC_PSM32);
+  //    // no idea if this is right, but lets try.
+  //    int w = vram_src->second.width;
+  //    int h = vram_src->second.height;
+  //    u8* tdata = vram_src->second.data_psm32.data();
+  //
+  //    // file_util::write_rgba_png("./before_transform.png", tdata, w, h);
+  //
+  //    for (int i = 0; i < w * h; i++) {
+  //      tdata[i * 4 + 2] = tdata[i * 4];
+  //      tdata[i * 4 + 3] = tdata[i * 4 + 1];
+  //    }
+  //
+  //    // file_util::write_rgba_png("./after_transform.png", tdata, w, h);
+  //
+  //  } else {
+  //    ASSERT_NOT_REACHED();
+  //  }
+}
+
+void TextureAnimator::handle_set_clut_alpha(const DmaTransfer& tf) {
+  ASSERT_NOT_REACHED();  // TODO: if re-enabling, needs alpha multiplier stuff
+  glUniform1f(m_uniforms.alpha_multiply, 1.f);
+
+  dprintf("[tex anim] set clut alpha\n");
+  ASSERT(tf.size_bytes == sizeof(TextureAnimPcTransform));
+  auto* data = (const TextureAnimPcTransform*)(tf.data);
+  dprintf("  src: %d, dest: %d\n", data->src_tbp, data->dst_tbp);
+  const auto& tex = m_textures.find(data->dst_tbp);
+  ASSERT(tex != m_textures.end());
+
+  ASSERT(tex->second.kind == VramEntry::Kind::GPU);
+  FramebufferTexturePairContext ctxt(tex->second.tex.value());
+  float positions[3 * 4] = {0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0};
+  float uvs[2 * 4] = {0, 0, 1, 0, 1, 1, 0, 1};
+  glUniform3fv(m_uniforms.positions, 4, positions);
+  glUniform2fv(m_uniforms.uvs, 4, uvs);
+  glUniform1i(m_uniforms.enable_tex, 0);  // NO TEXTURE!
+  glUniform4f(m_uniforms.rgba, 128, 128, 128, 128);
+  glUniform4i(m_uniforms.channel_scramble, 0, 1, 2, 3);
+  glBindTexture(GL_TEXTURE_2D, m_dummy_texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glDisable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
+  glColorMask(false, false, false, true);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  glColorMask(true, true, true, true);
+}
+
+void TextureAnimator::handle_copy_clut_alpha(const DmaTransfer& tf) {
+  ASSERT_NOT_REACHED();  // TODO: if re-enabling, needs alpha multiplier stuff
+  glUniform1f(m_uniforms.alpha_multiply, 1.f);
+
+  dprintf("[tex anim] __copy__ clut alpha\n");
+  ASSERT(tf.size_bytes == sizeof(TextureAnimPcTransform));
+  auto* data = (const TextureAnimPcTransform*)(tf.data);
+  dprintf("  src: %d, dest: %d\n", data->src_tbp, data->dst_tbp);
+  const auto& dst_tex = m_textures.find(data->dst_tbp);
+  const auto& src_tex = m_textures.find(data->src_tbp);
+  ASSERT(dst_tex != m_textures.end());
+  if (src_tex == m_textures.end()) {
+    lg::error("Skipping copy clut alpha because source texture at {} wasn't found", data->src_tbp);
+    return;
+  }
+  ASSERT(src_tex != m_textures.end());
+
+  ASSERT(dst_tex->second.kind == VramEntry::Kind::GPU);
+  ASSERT(src_tex->second.kind == VramEntry::Kind::GPU);
+
+  FramebufferTexturePairContext ctxt(dst_tex->second.tex.value());
+  float positions[3 * 4] = {0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0};
+  float uvs[2 * 4] = {0, 0, 1, 0, 1, 1, 0, 1};
+  glUniform3fv(m_uniforms.positions, 4, positions);
+  glUniform2fv(m_uniforms.uvs, 4, uvs);
+  glUniform1i(m_uniforms.enable_tex, 1);
+  glUniform4f(m_uniforms.rgba, 128, 128, 128, 128);  // TODO - seems wrong.
+  glUniform4i(m_uniforms.channel_scramble, 0, 1, 2, 3);
+  glBindTexture(GL_TEXTURE_2D, src_tex->second.tex.value().texture());
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glDisable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
+  glColorMask(false, false, false, true);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  glColorMask(true, true, true, true);
+}
+
+>>>>>>> upstream/8-12-vanilla
 void TextureAnimator::run_clut_blender_group(DmaTransfer& tf, int idx, u64 frame_idx) {
   float f;
   ASSERT(tf.size_bytes == 16);
@@ -1000,6 +1148,7 @@ void TextureAnimator::run_clut_blender_group(DmaTransfer& tf, int idx, u64 frame
   }
 }
 
+<<<<<<< HEAD
 void TextureAnimator::handle_clouds_and_fog(const DmaTransfer& tf,
                                             TexturePool* texture_pool,
                                             bool hires) {
@@ -1069,6 +1218,8 @@ void TextureAnimator::handle_slime(const DmaTransfer& tf, TexturePool* texture_p
   }
 }
 
+=======
+>>>>>>> upstream/8-12-vanilla
 void TextureAnimator::clear_stale_textures(u64 frame_idx) {
   for (auto& group : m_clut_blender_groups) {
     if (frame_idx > group.last_updated_frame) {
@@ -2495,6 +2646,7 @@ void TextureAnimator::setup_texture_anims() {
     m_krew_holo_anim_array_idx = create_fixed_anim_array({def});
   }
 }
+<<<<<<< HEAD
 
 // initial values of the random table for cloud texture generation.
 constexpr Vector16ub kInitialRandomTable[TextureAnimator::kRandomTableSize] = {
@@ -2816,3 +2968,5 @@ void TextureAnimator::run_slime(const SlimeInput& input) {
   glGenerateMipmap(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
+=======
+>>>>>>> upstream/8-12-vanilla
