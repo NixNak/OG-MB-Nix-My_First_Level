@@ -1642,6 +1642,13 @@
 ;; the DGO file
 (custom-level-cgo "TSZ.DGO" "test-zone/testzone.gd")
 
+;; my-first-level
+
+;; it should point to the .jsonc file that specifies the level.
+(build-custom-level "my-first-level")
+;; the DGO file
+(custom-level-cgo "MFL.DGO" "my-first-level/myfirstlevel.gd")
+
 ;;;;;;;;;;;;;;;;;;;;;
 ;; Game Engine Code
 ;;;;;;;;;;;;;;;;;;;;;

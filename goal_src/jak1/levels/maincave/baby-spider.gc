@@ -10,6 +10,7 @@
 
 ;; DECOMP BEGINS
 
+(import "goal_src/jak1/import/baby-spider-ag.gc")
 
 (deftype baby-spider-spawn-params (structure)
   ((hatched?                          symbol      :offset-assert   0)

@@ -19,10 +19,16 @@
     )
   )
 
+;; failed to figure out what this is:
 (init! *sky-texture-anim-array*)
-(init! *sky-hires-texture-anim-array*)
+
+;; failed to figure out what this is:
 (init! *darkjak-texture-anim-array*)
+
+;; failed to figure out what this is:
 (init! *skull-gem-texture-anim-array*)
+
+;; failed to figure out what this is:
 (init! *bomb-texture-anim-array*)
 
 (kmemclose)

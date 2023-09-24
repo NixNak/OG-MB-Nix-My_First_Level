@@ -5,5 +5,4 @@
 ("TSZ.DGO"
  ("static-screen.o"
   "test-zone.go"
-  "plat-ag.go"
  ))

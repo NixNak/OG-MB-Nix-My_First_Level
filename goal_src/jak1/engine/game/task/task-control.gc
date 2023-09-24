@@ -4053,7 +4053,7 @@
             )
           )
         )
-      (new 'static 'task-control
+        (new 'static 'task-control
         :current-stage -1
         :stage (new 'static 'boxed-array :type task-cstage
           (new 'static 'task-cstage
@@ -4071,6 +4071,36 @@
             )
           )
         )
+      (new 'static 'task-control
+        :current-stage -1
+        :stage (new 'static 'boxed-array :type task-cstage
+          (new 'static 'task-cstage
+            :game-task (game-task test-mfl)
+            :status (task-status need-hint)
+            :flags (task-flags has-entity )
+            :condition (lambda :behavior process-taskable ((arg0 task-control)) #t)
+            )
+          (new 'static 'task-cstage
+            :game-task (game-task test-mfl)
+            :status (task-status need-introduction)
+            :flags (task-flags has-entity )
+            :condition (lambda :behavior process-taskable ((arg0 task-control)) #t)
+            )
+          (new 'static 'task-cstage
+            :game-task (game-task test-mfl)
+            :status (task-status need-reminder)
+            :flags (task-flags has-entity)
+            :condition (lambda :behavior process-taskable ((arg0 task-control)) #t)
+            )
+          (new 'static 'task-cstage
+            :game-task (game-task test-mfl)
+            :status (task-status need-resolution)
+            :flags (task-flags has-entity)
+            :condition (lambda :behavior process-taskable ((arg0 task-control)) #t)
+            )
+          )
+        )
+    
       )
     )
   )

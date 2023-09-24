@@ -104,7 +104,7 @@
   (let ((v1-0 (new 'stack-no-clear 'vector)))
     (vector-! v1-0 (the-as vector (-> *mouse* pos)) (-> *mouse* pos 1))
     (cond
-      ((mouse-hold? left)
+      ((logtest? (-> *mouse* button0-abs 0) 1)
        (let ((a0-7 (new 'stack-no-clear 'vector)))
          0.0
          (vector-! a0-7 (-> *math-camera* trans) (-> *setting-control* cam-current mouse-tumble-point))
@@ -137,11 +137,11 @@
            )
          )
        )
-      ((mouse-hold? right)
+      ((logtest? (-> *mouse* button0-abs 0) 2)
        (+! (-> arg1 x) (* (-> v1-0 x) (-> *CAM_FREE-bank* speed)))
        (set! (-> arg1 z) (+ (-> arg1 z) (* (-> v1-0 y) (-> *CAM_FREE-bank* speed))))
        )
-      ((mouse-hold? middle)
+      ((logtest? (-> *mouse* button0-abs 0) 4)
        (+! (-> arg1 x) (* (-> v1-0 x) (-> *CAM_FREE-bank* speed)))
        (set! (-> arg1 y) (+ (-> arg1 y) (* (-> v1-0 y) (-> *CAM_FREE-bank* speed))))
        )

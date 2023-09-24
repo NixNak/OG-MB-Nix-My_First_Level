@@ -1650,7 +1650,6 @@
   (speedrun-hub2-100             #x1522)
   (speedrun-hub3-100             #x1523)
   (speedrun-all-cutscenes        #x1524)
-
   ;; input options
   (input-options #x1600)
   (input-opts-select-controller #x1601)
@@ -15798,7 +15797,6 @@
   (quit 34)
 
   ;; extra screens for pc port
-
   ;; input options
   (input-options)
   (select-controller)

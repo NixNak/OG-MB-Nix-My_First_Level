@@ -563,11 +563,7 @@
 
     // krew
     "krew-holo-dest",
-    "metkor-phong-env",
-
-    // castle slime
-    "cas-toxic-slime-scroll-dest",
-    "cas-toxic-slime-dest"
+    "metkor-phong-env"
 
     // "kor-eyeeffect-formorph",
     // "kor-eyeeffect-formorph-start",

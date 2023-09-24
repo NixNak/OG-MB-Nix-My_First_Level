@@ -49,7 +49,6 @@
   )
 
 (defenum pickup-type
-  :type int32
   (none)
   (eco-yellow)
   (eco-red)

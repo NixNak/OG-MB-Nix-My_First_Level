@@ -1608,9 +1608,7 @@
                         )
                )
         )
-      (10000 (apply ,(lambda () (set! (-> hiphog memory-mode) (load-buffer-mode small-edge)) 0 (none)))
-        (time-of-day -1) ;; pc port note : added this to unfreeze time of day
-        )
+      (10000 (apply ,(lambda () (set! (-> hiphog memory-mode) (load-buffer-mode small-edge)) 0 (none))))
       )
     :cut-list '(245
        299

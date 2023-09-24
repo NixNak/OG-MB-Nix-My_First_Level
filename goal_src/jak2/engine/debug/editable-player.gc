@@ -1447,25 +1447,24 @@
     )
   (when #t
     (format *stdcon* "~0K")
-    (format *stdcon* "~%~%") ;; added
-    (format *stdcon* "~16S~16S~16S~%" "Left button" "Middle button" "Right button")
+    (format *stdcon* "~%~%~16S~16S~16S~%" "Left button" "Middle button" "Right button")
     (format
       *stdcon*
       "~16S~16S~16S~%"
       (editable-command->string
-        (if (and (nonzero? (-> obj command 1)) (or (zero? (-> obj command 0)) (mouse-hold? left)))
+        (if (and (nonzero? (-> obj command 1)) (or (zero? (-> obj command 0)) (logtest? (-> *mouse* button0-abs 0) 1)))
             (the-as editable-command (-> obj command 1))
             (the-as editable-command (-> obj command 0))
             )
         )
       (editable-command->string
-        (if (and (nonzero? (-> obj command 5)) (or (zero? (-> obj command 4)) (mouse-hold? middle)))
+        (if (and (nonzero? (-> obj command 5)) (or (zero? (-> obj command 4)) (logtest? (-> *mouse* button0-abs 0) 4)))
             (the-as editable-command (-> obj command 5))
             (the-as editable-command (-> obj command 4))
             )
         )
       (editable-command->string
-        (if (and (nonzero? (-> obj command 3)) (or (zero? (-> obj command 2)) (mouse-hold? right)))
+        (if (and (nonzero? (-> obj command 3)) (or (zero? (-> obj command 2)) (logtest? (-> *mouse* button0-abs 0) 2)))
             (the-as editable-command (-> obj command 3))
             (the-as editable-command (-> obj command 2))
             )
@@ -2018,19 +2017,19 @@
              )
            )
           )
-        (if (mouse-pressed? left)
+        (if (logtest? (-> *mouse* button0-rel 0) 1)
             (editable-array-method-9 gp-0 (the-as editable-command (-> self command 0)) (the-as editable-array *mouse*))
             )
-        (if (mouse-hold? left)
+        (if (logtest? (-> *mouse* button0-abs 0) 1)
             (editable-array-method-9 gp-0 (the-as editable-command (-> self command 1)) (the-as editable-array *mouse*))
             )
-        (if (mouse-pressed? right)
+        (if (logtest? (-> *mouse* button0-rel 0) 2)
             (editable-array-method-9 gp-0 (the-as editable-command (-> self command 2)) (the-as editable-array *mouse*))
             )
-        (if (mouse-hold? right)
+        (if (logtest? (-> *mouse* button0-abs 0) 2)
             (editable-array-method-9 gp-0 (the-as editable-command (-> self command 3)) (the-as editable-array *mouse*))
             )
-        (when (mouse-pressed? middle)
+        (when (logtest? (-> *mouse* button0-rel 0) 4)
           (let ((a2-11 (-> self command 4)))
             (case a2-11
               ((36)
@@ -2045,7 +2044,7 @@
               )
             )
           )
-        (if (mouse-hold? middle)
+        (if (logtest? (-> *mouse* button0-abs 0) 4)
             (editable-array-method-9 gp-0 (the-as editable-command (-> self command 5)) (the-as editable-array *mouse*))
             )
         )
